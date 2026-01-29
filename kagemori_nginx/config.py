@@ -7,11 +7,11 @@ class KagemoriNGINXConfig:
             "pid": os.path.join(nginx_configuration_directory, "nginx.pid"),
             "error_log": os.path.join(nginx_configuration_directory, "logs", "error.log"),
             "events": {
-                "worker_connections": 768;
+                "worker_connections": 768
             },
             "http": {
                 "sendfile": "on",
-                "types_hash_max_size": 2048;
+                "types_hash_max_size": 2048,
                 "client_body_temp_path": os.path.join(nginx_configuration_directory, "tmp", "client_body"),
                 "proxy_temp_path": os.path.join(nginx_configuration_directory, "tmp", "proxy"),
                 "fastcgi_temp_path": os.path.join(nginx_configuration_directory, "tmp", "fastcgi"),
