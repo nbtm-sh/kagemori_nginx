@@ -70,8 +70,9 @@ class KagemoriNGINXConfig:
 
     @staticmethod
     def _generate_server_config(listen, default_server, resolver, server_name, enable_ssl, ssl_certificate=None):
+        listen += "default_server" if default_server else "";
         result = {
-            "listen": listen + "default_server" if default_server else "",
+            "listen": listen,
             "resolver": resolver,
             "server_name": server_name,
             "location /": {
