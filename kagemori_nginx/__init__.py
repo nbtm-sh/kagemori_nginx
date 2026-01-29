@@ -1,5 +1,6 @@
 import psutil, os, subprocess, logging
 from kagemori_nginx.config import KagemoriNGINXConfig
+from kagemori_nginx.dir import create_directory_for_path
 
 class KagemoriNGINX:
     NGINX_STATE_RUNNING = 1
@@ -12,6 +13,10 @@ class KagemoriNGINX:
         self.nginx_state = KagemoriNGINX.NGINX_STATE_STOPPED
         self.kagemori_socket_file = kagemori_socket_file
         self.listen_socket = listen_socket
+
+        create_directory_for_path(self.nginx_configuration_path)
+        create_directory_for_path(os.path.join(self.nginx_configuration_path, "logs"))
+        create_directory_for_path(os.path.join(self.nginx_configuration_path, "tmp"))
 
         self._nginx_pid = None
         self.config = KagemoriNGINXConfig(
