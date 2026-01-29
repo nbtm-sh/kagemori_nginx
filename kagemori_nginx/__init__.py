@@ -66,15 +66,15 @@ class KagemoriNGINX:
         return False
 
     def _subprocess_reload_nginx(self):
-        return subprocess.run([self.nginx_binary, "-p" self.nginx_configuration_path, "-c", "nginx.conf", "-s", "reload"])
+        return subprocess.run([self.nginx_binary, "-p", self.nginx_configuration_path, "-c", "nginx.conf", "-s", "reload"])
 
     def _subprocess_stop_nginx(self):
-        return subprocess.run([self.nginx_binary, "-p" self.nginx_configuration_path, "-c", "nginx.conf", "-s", "stop"])
+        return subprocess.run([self.nginx_binary, "-p", self.nginx_configuration_path, "-c", "nginx.conf", "-s", "stop"])
 
     def _subprocess_start_nginx(self):
-        return subprocess.run([self.nginx_binary, "-p" self.nginx_configuration_path, "-c", "nginx.conf"])
+        return subprocess.run([self.nginx_binary, "-p", self.nginx_configuration_path, "-c", "nginx.conf"])
 
-    def _update_nginx_pid(self)
+    def _update_nginx_pid(self):
         self._nginx_pid = KagemoriNGINX._get_nginx_pid(self.nginx_pid_file)
 
     def _update_nginx_state(self):
