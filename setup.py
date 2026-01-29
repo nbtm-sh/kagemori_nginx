@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-requirements = [ 'chibi-nginx==1.0.0' ]
+requirements = [ 'chibi-nginx==1.0.0', 'psutil' ]
 
 setup(
     author="nbtm-sh",
