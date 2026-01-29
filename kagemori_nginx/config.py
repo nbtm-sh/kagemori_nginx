@@ -53,7 +53,7 @@ class KagemoriNGINXConfig:
         self.config["http"]["server"].append(server_config)
         self.write_config()
 
-    def find_server(server_name):
+    def find_server(self, server_name):
         if "server" not in self.config["http"]:
             return None
 
