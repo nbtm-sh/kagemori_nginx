@@ -82,7 +82,7 @@ class KagemoriNGINX:
         return subprocess.run([self.nginx_binary, "-p", self.nginx_configuration_path, "-c", "nginx.conf", "-s", "reload"])
 
     def _subprocess_stop_nginx(self):
-        return subprocess.run([self.nginx_binary, "-p", self.nginx_configuration_path, "-c", "nginx.conf", "-s", "stop"])
+        return subprocess.run([self.nginx_binary, "-p", self.nginx_configuration_path, "-c", "nginx.conf", "-s", "quit"])
 
     def _subprocess_start_nginx(self):
         return subprocess.run([self.nginx_binary, "-p", self.nginx_configuration_path, "-c", "nginx.conf"])
