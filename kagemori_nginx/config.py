@@ -60,6 +60,7 @@ class KagemoriNGINXConfig:
         for i in range(len(self.config["http"]["server"])):
             if self.config["http"]["server"][i]["server_name"] == server_name:
                 del self.config["http"]["server"][i]
+                self.write_config()
                 return True
 
         return False
