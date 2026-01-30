@@ -6,7 +6,7 @@ class KagemoriNGINX:
     NGINX_STATE_RUNNING = 1
     NGINX_STATE_STOPPED = 0
 
-    def __init__(self, nginx_binary="nginx", nginx_configuration_path="nginx-conf", nginx_pid_file="nginx.pid", resolver="1.1.1.1", kagemori_socket_file="", listen_socket=""):
+    def __init__(self, nginx_binary="nginx", nginx_configuration_path="nginx-conf", nginx_pid_file="nginx.pid", resolver="1.1.1.1", kagemori_socket_file="", listen_socket="", reload_when_start_called_if_running=True):
         self.nginx_binary = nginx_binary
         self.nginx_configuration_path = nginx_configuration_path
         self.nginx_pid_file = os.path.join(nginx_configuration_path, nginx_pid_file)
@@ -17,6 +17,13 @@ class KagemoriNGINX:
         create_directory_for_path(self.nginx_configuration_path)
         create_directory_for_path(os.path.join(self.nginx_configuration_path, "logs"))
         create_directory_for_path(os.path.join(self.nginx_configuration_path, "tmp"))
+        create_directory_for_path(os.path.join(self.nginx_configuration_path, "tmp", "client_body"))
+        create_directory_for_path(os.path.join(self.nginx_configuration_path, "tmp", "proxy"))
+        create_directory_for_path(os.path.join(self.nginx_configuration_path, "tmp", "fastcgi"))
+        create_directory_for_path(os.path.join(self.nginx_configuration_path, "tmp", "uwsgi"))
+        create_directory_for_path(os.path.join(self.nginx_configuration_path, "tmp", "scgi"))
+
+        self.reload_when_start_called_if_running = reload_when_start_called_if_running
 
         self._nginx_pid = None
         self.config = KagemoriNGINXConfig(
@@ -37,6 +44,10 @@ class KagemoriNGINX:
             # Start NGINX
             self._subprocess_start_nginx()
             return True
+        
+        if self.reload_when_start_called_if_running:
+            self._subprocess_reload_nginx()
+            return True
 
         self.logger.warn(f"NGINX seems to already be running. PID {self._nginx_pid}. Consider using reload().")
         return False
@@ -48,6 +59,8 @@ class KagemoriNGINX:
         if self.nginx_state == KagemoriNGINX.NGINX_STATE_RUNNING:
             # Stop NGINX
             self._subprocess_stop_nginx()
+            nginx_proc = psutil.Process(self._nginx_pid)
+            nginx_proc.kill()
             return True
 
         self.logger.warn(f"NGINX is already stopped. No action was taken.")
@@ -69,7 +82,7 @@ class KagemoriNGINX:
         return subprocess.run([self.nginx_binary, "-p", self.nginx_configuration_path, "-c", "nginx.conf", "-s", "reload"])
 
     def _subprocess_stop_nginx(self):
-        return subprocess.run([self.nginx_binary, "-p", self.nginx_configuration_path, "-c", "nginx.conf", "-s", "stop"])
+        return subprocess.run([self.nginx_binary, "-p", self.nginx_configuration_path, "-c", "nginx.conf", "-s", "quit"])
 
     def _subprocess_start_nginx(self):
         return subprocess.run([self.nginx_binary, "-p", self.nginx_configuration_path, "-c", "nginx.conf"])
@@ -78,7 +91,9 @@ class KagemoriNGINX:
         self._nginx_pid = KagemoriNGINX._get_nginx_pid(self.nginx_pid_file)
 
     def _update_nginx_state(self):
+        self._nginx_pid = KagemoriNGINX._get_nginx_pid(self.nginx_pid_file)
         state = KagemoriNGINX._get_nginx_state(self._nginx_pid)
+
         if state:
             self.nginx_state = KagemoriNGINX.NGINX_STATE_RUNNING
         else:
@@ -89,10 +104,13 @@ class KagemoriNGINX:
         if not os.path.exists(nginx_pid_file):
             return None
 
-        with open(nginx_pid_file, "r"):
-            return nginx_pid_file.read().strip()
+        with open(nginx_pid_file, "r") as nginx_pid_fp:
+            return int(nginx_pid_fp.read().strip())
 
     @staticmethod
     def _get_nginx_state(nginx_pid):
         # TODO: Stale PIDs could cause this to return true when NGINX is not actually running
+        if nginx_pid is None:
+            return False
+
         return psutil.pid_exists(nginx_pid)

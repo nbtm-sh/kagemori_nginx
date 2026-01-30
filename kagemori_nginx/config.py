@@ -4,19 +4,19 @@ from chibi_nginx.nginx import to_string
 class KagemoriNGINXConfig:
     def __init__(self, nginx_configuration_directory, nginx_configuration_file="nginx.conf", upstream_socket="/tmp/kagemori-user/kagemori.sock", listen_socket="/tmp/kagemori-user/nginx.sock", resolver=""):
         self.default_config = {
-            "pid": os.path.join(nginx_configuration_directory, "nginx.pid"),
-            "error_log": os.path.join(nginx_configuration_directory, "logs", "error.log"),
+            "pid": os.path.join("nginx.pid"),
+            "error_log": os.path.join("logs", "error.log"),
             "events": {
                 "worker_connections": 768
             },
             "http": {
                 "sendfile": "on",
                 "types_hash_max_size": 2048,
-                "client_body_temp_path": os.path.join(nginx_configuration_directory, "tmp", "client_body"),
-                "proxy_temp_path": os.path.join(nginx_configuration_directory, "tmp", "proxy"),
-                "fastcgi_temp_path": os.path.join(nginx_configuration_directory, "tmp", "fastcgi"),
-                "uwsgi_temp_path": os.path.join(nginx_configuration_directory, "tmp", "uwsgi"),
-                "scgi_temp_path": os.path.join(nginx_configuration_directory, "tmp", "scgi"),
+                "client_body_temp_path": os.path.join("tmp", "client_body"),
+                "proxy_temp_path": os.path.join("tmp", "proxy"),
+                "fastcgi_temp_path": os.path.join("tmp", "fastcgi"),
+                "uwsgi_temp_path": os.path.join("tmp", "uwsgi"),
+                "scgi_temp_path": os.path.join("tmp", "scgi"),
                 "default_type": "application/octet-stream",
                 "gzip": "on",
                 "upstream kageauth": {
@@ -84,9 +84,10 @@ class KagemoriNGINXConfig:
     def _generate_server_config(listen, default_server, resolver, server_name, enable_ssl, ssl_certificate=None):
         listen += "default_server" if default_server else "";
         result = {
-            "listen": listen,
+            "listen": "unix:" + listen,
             "resolver": resolver,
             "server_name": server_name,
+            "access_log": os.path.join("logs", f"access.{server_name}.log"),
             "location /": {
                 "auth_request": "/auth",
                 "auth_request_set": ["$kagemori_proxy_target $upstream_http_x_kage_forward", "$kagemori_ssl_cert $upstream_http_x_kage_ssl"],
