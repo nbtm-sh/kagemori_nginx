@@ -6,7 +6,7 @@ class KagemoriNGINX:
     NGINX_STATE_RUNNING = 1
     NGINX_STATE_STOPPED = 0
 
-    def __init__(self, nginx_binary="nginx", nginx_configuration_path="nginx-conf", nginx_pid_file="nginx.pid", resolver="1.1.1.1", kagemori_socket_file="", listen_socket=""):
+    def __init__(self, nginx_binary="nginx", nginx_configuration_path="nginx-conf", nginx_pid_file="nginx.pid", resolver="1.1.1.1", kagemori_socket_file="", listen_socket="", reload_when_start_called_if_running=True):
         self.nginx_binary = nginx_binary
         self.nginx_configuration_path = nginx_configuration_path
         self.nginx_pid_file = os.path.join(nginx_configuration_path, nginx_pid_file)
@@ -17,6 +17,13 @@ class KagemoriNGINX:
         create_directory_for_path(self.nginx_configuration_path)
         create_directory_for_path(os.path.join(self.nginx_configuration_path, "logs"))
         create_directory_for_path(os.path.join(self.nginx_configuration_path, "tmp"))
+        create_directory_for_path(os.path.join(self.nginx_configuration_path, "tmp", "client_body"))
+        create_directory_for_path(os.path.join(self.nginx_configuration_path, "tmp", "proxy"))
+        create_directory_for_path(os.path.join(self.nginx_configuration_path, "tmp", "fastcgi"))
+        create_directory_for_path(os.path.join(self.nginx_configuration_path, "tmp", "uwsgi"))
+        create_directory_for_path(os.path.join(self.nginx_configuration_path, "tmp", "scgi"))
+
+        self.reload_when_start_called_if_running = reload_when_start_called_if_running
 
         self._nginx_pid = None
         self.config = KagemoriNGINXConfig(
@@ -36,6 +43,10 @@ class KagemoriNGINX:
         if self.nginx_state == KagemoriNGINX.NGINX_STATE_STOPPED:
             # Start NGINX
             self._subprocess_start_nginx()
+            return True
+        
+        if self.reload_when_start_called_if_running:
+            self._subprocess_reload_nginx()
             return True
 
         self.logger.warn(f"NGINX seems to already be running. PID {self._nginx_pid}. Consider using reload().")
