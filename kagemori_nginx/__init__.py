@@ -59,6 +59,8 @@ class KagemoriNGINX:
         if self.nginx_state == KagemoriNGINX.NGINX_STATE_RUNNING:
             # Stop NGINX
             self._subprocess_stop_nginx()
+            nginx_proc = psutil.Process(self._nginx_pid)
+            nginx_proc.kill()
             return True
 
         self.logger.warn(f"NGINX is already stopped. No action was taken.")
@@ -89,7 +91,9 @@ class KagemoriNGINX:
         self._nginx_pid = KagemoriNGINX._get_nginx_pid(self.nginx_pid_file)
 
     def _update_nginx_state(self):
+        self._nginx_pid = KagemoriNGINX._get_nginx_pid(self.nginx_pid_file)
         state = KagemoriNGINX._get_nginx_state(self._nginx_pid)
+
         if state:
             self.nginx_state = KagemoriNGINX.NGINX_STATE_RUNNING
         else:
@@ -100,10 +104,13 @@ class KagemoriNGINX:
         if not os.path.exists(nginx_pid_file):
             return None
 
-        with open(nginx_pid_file, "r"):
-            return nginx_pid_file.read().strip()
+        with open(nginx_pid_file, "r") as nginx_pid_fp:
+            return int(nginx_pid_fp.read().strip())
 
     @staticmethod
     def _get_nginx_state(nginx_pid):
         # TODO: Stale PIDs could cause this to return true when NGINX is not actually running
+        if nginx_pid is None:
+            return False
+
         return psutil.pid_exists(nginx_pid)
