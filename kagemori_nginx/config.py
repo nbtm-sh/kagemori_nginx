@@ -4,19 +4,19 @@ from chibi_nginx.nginx import to_string
 class KagemoriNGINXConfig:
     def __init__(self, nginx_configuration_directory, nginx_configuration_file="nginx.conf", upstream_socket="/tmp/kagemori-user/kagemori.sock", listen_socket="/tmp/kagemori-user/nginx.sock", resolver=""):
         self.default_config = {
-            "pid": os.path.join(nginx_configuration_directory, "nginx.pid"),
-            "error_log": os.path.join(nginx_configuration_directory, "logs", "error.log"),
+            "pid": os.path.join("nginx.pid"),
+            "error_log": os.path.join("logs", "error.log"),
             "events": {
                 "worker_connections": 768
             },
             "http": {
                 "sendfile": "on",
                 "types_hash_max_size": 2048,
-                "client_body_temp_path": os.path.join(nginx_configuration_directory, "tmp", "client_body"),
-                "proxy_temp_path": os.path.join(nginx_configuration_directory, "tmp", "proxy"),
-                "fastcgi_temp_path": os.path.join(nginx_configuration_directory, "tmp", "fastcgi"),
-                "uwsgi_temp_path": os.path.join(nginx_configuration_directory, "tmp", "uwsgi"),
-                "scgi_temp_path": os.path.join(nginx_configuration_directory, "tmp", "scgi"),
+                "client_body_temp_path": os.path.join("tmp", "client_body"),
+                "proxy_temp_path": os.path.join("tmp", "proxy"),
+                "fastcgi_temp_path": os.path.join("tmp", "fastcgi"),
+                "uwsgi_temp_path": os.path.join("tmp", "uwsgi"),
+                "scgi_temp_path": os.path.join("tmp", "scgi"),
                 "default_type": "application/octet-stream",
                 "gzip": "on",
                 "upstream kageauth": {
