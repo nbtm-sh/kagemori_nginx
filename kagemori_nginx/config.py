@@ -87,6 +87,7 @@ class KagemoriNGINXConfig:
             "listen": "unix:" + listen,
             "resolver": resolver,
             "server_name": server_name,
+            "access_log": os.path.join("logs", f"access.{server_name}.log"),
             "location /": {
                 "auth_request": "/auth",
                 "auth_request_set": ["$kagemori_proxy_target $upstream_http_x_kage_forward", "$kagemori_ssl_cert $upstream_http_x_kage_ssl"],
