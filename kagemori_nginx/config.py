@@ -83,6 +83,7 @@ class KagemoriNGINXConfig:
     @staticmethod
     def _generate_server_config(listen, default_server, resolver, server_name, enable_ssl, ssl_certificate=None):
         listen += "default_server" if default_server else "";
+        http = "https" if enable_ssl else "http"
         result = {
             "listen": "unix:" + listen,
             "resolver": resolver,
@@ -92,7 +93,7 @@ class KagemoriNGINXConfig:
                 "auth_request": "/auth",
                 "auth_request_set": ["$kagemori_proxy_target $upstream_http_x_kage_forward", "$kagemori_ssl_cert $upstream_http_x_kage_ssl"],
                 "proxy_set_header": ["X-Forwarded-For $proxy_add_x_forwarded_for", "Host $host"],
-                "proxy_pass": "https" if enable_ssl else "http" + "://$kagemori_proxy_target",
+                "proxy_pass": http + "://$kagemori_proxy_target",
                 "proxy_http_version": "1.1",
                 "proxy_set_header": ["Upgrade $http_upgrade", "Connection \"upgrade\"", "Sec-WebSocket-Key $http_sec_websocket_key", "Sec-WebSocket-Version $http_sec_websocket_version", "Sec-WebSocket-Extensions $http_sec_websocket_extensions"],
                 "proxy_read_timeout": "86400s"
