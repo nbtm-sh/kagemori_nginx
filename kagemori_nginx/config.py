@@ -31,7 +31,7 @@ class KagemoriNGINXConfig:
         self.resolver = resolver
         self.write_config()
 
-    def add_server(self, server_name, default_server=False, enable_ssl=False, ssl_certificate=None):
+    def add_server(self, server_name, default_server=False, enable_ssl=False, ssl_certificate=None, ssl_validate=False):
         if self.find_server(server_name) is not None:
             raise KagemoriNGINXConfig.DuplicateServerName(f"{server_name} is already configured")
 
@@ -44,7 +44,8 @@ class KagemoriNGINXConfig:
             resolver = self.resolver,
             server_name = server_name,
             enable_ssl = enable_ssl,
-            ssl_certificate = ssl_certificate
+            ssl_certificate = ssl_certificate,
+            ssl_validate = ssl_validate
         )
 
         if "server" not in self.config["http"]:
@@ -81,7 +82,7 @@ class KagemoriNGINXConfig:
             nginx_fp.write(write_data)
 
     @staticmethod
-    def _generate_server_config(listen, default_server, resolver, server_name, enable_ssl, ssl_certificate=None):
+    def _generate_server_config(listen, default_server, resolver, server_name, enable_ssl, ssl_certificate=None, ssl_validate=False):
         listen += "default_server" if default_server else "";
         http = "https" if enable_ssl else "http"
         result = {
@@ -106,7 +107,8 @@ class KagemoriNGINXConfig:
         }
 
         if enable_ssl:
-            result["location /"]["proxy_ssl_verify"] = "on"
+            if ssl_validate:
+                result["location /"]["proxy_ssl_verify"] = "on"
             result["location /"]["proxy_ssl_trusted_certificate"] = ssl_certificate
             result["location /"]["proxy_ssl_verify_depth"] = "1"
 
