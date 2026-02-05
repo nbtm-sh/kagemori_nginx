@@ -8,6 +8,6 @@ setup(
     description="nginx configuration wrapper for kagemori",
     install_requires=requirements,
     packages=find_packages(include=['kagemori_nginx']),
-    version="0.1rc5",
+    version="0.1",
     name="kagemori-nginx"
 )
